@@ -5,7 +5,7 @@ export async function GET() {
 
   const db = client.db(process.env.DB_NAME);
 
-  await db.collection("guu").insertOne({
+  await db.collection("user").insertOne({
     message: "MongoDB Connected Hoise Ajke",
     createdAt: new Date(),
   });

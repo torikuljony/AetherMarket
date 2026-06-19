@@ -1,27 +1,33 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
 import { auth } from "@/firebase/firebase.config";
+import { useRouter } from "next/navigation";
 
-export default function RegisterModal() {
-  const router = useRouter();
+export default function RegisterModal({ setShowRegister }) {
   const { googleLogin } = useAuth();
+  const router = useRouter();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user");
 
   const closeModal = () => {
-    router.push("/");
+    if (setShowRegister) {
+      setShowRegister(false);
+    } else {
+      router.push("/");
+    }
   };
 
   useEffect(() => {
@@ -30,7 +36,10 @@ export default function RegisterModal() {
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const handleRegister = async (e) => {
@@ -45,6 +54,13 @@ export default function RegisterModal() {
 
       await updateProfile(result.user, {
         displayName: name,
+      });
+
+      console.log({
+        uid: result.user.uid,
+        name,
+        email,
+        role,
       });
 
       alert("Registration Successful");
@@ -67,18 +83,15 @@ export default function RegisterModal() {
 
   return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center">
-      {/* BACKDROP */}
       <div
         onClick={closeModal}
         className="absolute inset-0 bg-black/40 backdrop-blur-md"
       />
 
-      {/* MODAL */}
       <div
         onClick={(e) => e.stopPropagation()}
         className="relative z-10 w-full max-w-md rounded-3xl border border-[#2a2f46] bg-[#0d1120] p-8 text-white shadow-2xl"
       >
-        {/* CLOSE */}
         <button
           type="button"
           onClick={closeModal}
@@ -87,12 +100,10 @@ export default function RegisterModal() {
           <X size={22} />
         </button>
 
-        {/* TITLE */}
         <h2 className="text-3xl font-bold text-center">
           Create Account
         </h2>
 
-        {/* FORM */}
         <form onSubmit={handleRegister} className="mt-8 space-y-4">
           <input
             value={name}
@@ -116,6 +127,15 @@ export default function RegisterModal() {
             className="w-full h-12 rounded-xl bg-[#14192d] border border-[#2a2f46] px-4 text-white outline-none"
           />
 
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full h-12 rounded-xl bg-[#14192d] border border-[#2a2f46] px-4 text-white outline-none"
+          >
+            <option value="user">Standard User</option>
+            <option value="creator">Creator</option>
+          </select>
+
           <button
             type="submit"
             className="w-full h-12 rounded-xl bg-[#d8c3ff] text-black font-semibold hover:opacity-90 transition"
@@ -124,14 +144,12 @@ export default function RegisterModal() {
           </button>
         </form>
 
-        {/* DIVIDER */}
         <div className="flex items-center gap-4 my-6">
           <div className="flex-1 h-[1px] bg-[#2a2f46]" />
           <span className="text-gray-400 text-sm">OR</span>
           <div className="flex-1 h-[1px] bg-[#2a2f46]" />
         </div>
 
-        {/* GOOGLE */}
         <button
           onClick={handleGoogleRegister}
           className="w-full h-12 rounded-xl bg-white flex items-center justify-center gap-3 font-semibold text-black border border-gray-200 hover:bg-gray-100 transition"
@@ -142,7 +160,6 @@ export default function RegisterModal() {
           </span>
         </button>
 
-        {/* LOGIN LINK */}
         <p className="text-center text-gray-400 mt-6">
           Already have an account?{" "}
           <Link href="/login" className="text-[#d8c3ff] hover:underline">
@@ -153,3 +170,4 @@ export default function RegisterModal() {
     </div>
   );
 }
+
