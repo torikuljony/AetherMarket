@@ -1,9 +1,11 @@
 import assets from "@/data/assets";
 import { notFound } from "next/navigation";
 
-export default function PromptDetailsPage({ params }) {
+export default async function PromptDetailsPage({ params }) {
+  const { id } = await params;     // ← এটা খুব জরুরি
+
   const asset = assets.find(
-    (item) => item.id === Number(params.id)
+    (item) => item.id === Number(id)
   );
 
   if (!asset) return notFound();
@@ -89,7 +91,7 @@ export default function PromptDetailsPage({ params }) {
           <div className="bg-[#11192d] border border-[#2a2f46] rounded-2xl p-6">
 
             <h2 className="text-3xl font-bold text-white mb-4">
-              ${asset.price}
+              {asset.price === 0 ? "FREE" : `$${asset.price}`}
             </h2>
 
             <button className="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-xl text-white font-semibold transition">

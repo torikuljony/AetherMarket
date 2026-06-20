@@ -16,11 +16,7 @@ export default function LoginModal() {
   const [password, setPassword] = useState("");
 
   const closeModal = () => {
-    if (window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/");
-    }
+    router.push("/");
   };
 
   useEffect(() => {
@@ -32,10 +28,55 @@ export default function LoginModal() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const saveUserToDB = async (userData) => {
+    try {
+      await fetch("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getUserRole = async (email) => {
+    try {
+      const res = await fetch(`/api/users/${email}`);
+      const data = await res.json();
+      return data?.role || "user";
+    } catch (error) {
+      console.log(error);
+      return "user";
+    }
+  };
+
+  const redirectDashboard = (role) => {
+    if (role === "admin") {
+      router.push("/dashboard/admin");
+    } else if (role === "creator") {
+      router.push("/dashboard/creator");
+    } else {
+      router.push("/dashboard/user");
+    }
+  };
+
   const handleGoogleLogin = async () => {
     try {
-      await googleLogin();
-      closeModal();
+      const result = await googleLogin();
+
+      await saveUserToDB({
+        uid: result.user.uid,
+        name: result.user.displayName,
+        email: result.user.email,
+        image: result.user.photoURL,
+        role: "user",
+      });
+
+      const role = await getUserRole(result.user.email);
+      redirectDashboard(role);
     } catch (error) {
       console.log(error);
       alert(error.message);
@@ -46,9 +87,16 @@ export default function LoginModal() {
     e.preventDefault();
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      const role = await getUserRole(result.user.email);
+
       alert("Login Successful");
-      closeModal();
+      redirectDashboard(role);
     } catch (error) {
       console.log(error);
       alert(error.message);
@@ -83,7 +131,7 @@ export default function LoginModal() {
 
         <button
           onClick={handleGoogleLogin}
-          className="mt-6 w-full h-12 flex items-center justify-center gap-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition"
+          className="mt-6 w-full h-12 flex items-center justify-center gap-3 rounded-xl bg-white text-black font-semibold"
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"

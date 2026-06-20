@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import LoginModal from "../Auth/LoginModal";
 import useAuth from "@/hooks/useAuth";
@@ -11,14 +11,38 @@ import {
   LayoutDashboard,
   Menu,
   X,
+  Sparkles,        // ← শুধু এটা যোগ করা হয়েছে
 } from "lucide-react";
 
 export default function Navbar() {
   const [showLogin, setShowLogin] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [role, setRole] = useState("user");
 
   const { user, logOut } = useAuth();
   const pathname = usePathname();
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!user?.email) return;
+
+      try {
+        const res = await fetch(`/api/users/${user.email}`);
+        const data = await res.json();
+        setRole(data?.role || "user");
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchRole();
+  }, [user]);
+
+  const getDashboardRoute = () => {
+    if (role === "admin") return "/dashboard/admin";
+    if (role === "creator") return "/dashboard/creator";
+    return "/dashboard/user";
+  };
 
   const handleLogout = async () => {
     try {
@@ -36,17 +60,17 @@ export default function Navbar() {
       <nav className="sticky top-0 z-50 w-full border-b border-[#1f2336] bg-[#050816]">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 md:px-6 h-[72px]">
 
-          {/* LOGO */}
-          <Link href="/">
+          {/* Logo with Sparkle Icon */}
+          <Link href="/" className="flex items-center gap-2.5">
+            <Sparkles className="w-8 h-8 text-[#a78bff]" />
             <h1 className="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-[#d8c3ff]">
               AetherMarket
             </h1>
           </Link>
 
-          {/* RIGHT SIDE */}
+          {/* বাকি সবকিছু আগের মতোই আছে */}
           <div className="flex items-center gap-4">
-
-            {/* DESKTOP NAV */}
+            {/* ... তোমার আগের সব কোড এখানে একদম একই থাকবে ... */}
             <ul className="hidden md:flex items-center gap-8 text-[15px] font-semibold">
               <li>
                 <Link
@@ -75,7 +99,7 @@ export default function Navbar() {
               </li>
             </ul>
 
-            {/* DESKTOP AUTH */}
+            {/* Login / Dashboard / Profile / Logout buttons এবং Mobile Menu সব আগের মতোই */}
             {!user ? (
               <button
                 onClick={() => setShowLogin(true)}
@@ -86,7 +110,7 @@ export default function Navbar() {
               </button>
             ) : (
               <>
-                <Link href="/admin">
+                <Link href={getDashboardRoute()}>
                   <button className="hidden md:flex h-10 px-4 rounded-full border border-[#7b61ff] text-[#d8c3ff] items-center gap-2 hover:bg-[#7b61ff]/10 transition">
                     <LayoutDashboard size={18} />
                     Dashboard
@@ -116,7 +140,6 @@ export default function Navbar() {
               </>
             )}
 
-            {/* MOBILE MENU BUTTON */}
             <button
               onClick={() => setMobileMenu(!mobileMenu)}
               className="md:hidden text-white"
@@ -126,65 +149,27 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* MOBILE MENU */}
+        {/* Mobile Menu - আগের মতোই */}
         {mobileMenu && (
           <div className="md:hidden absolute top-[72px] left-0 w-full bg-[#0c1020] border-t border-[#1f2336] z-50">
             <div className="px-6 py-5">
-
               <div className="flex flex-col gap-4 text-[#a5a8bb] font-medium">
-
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenu(false)}
-                  className="hover:text-white transition"
-                >
-                  Home
-                </Link>
-
-                <Link
-                  href="/marketplace"
-                  onClick={() => setMobileMenu(false)}
-                  className="hover:text-white transition"
-                >
-                  All Prompts
-                </Link>
-
+                <Link href="/" onClick={() => setMobileMenu(false)} className="hover:text-white transition">Home</Link>
+                <Link href="/marketplace" onClick={() => setMobileMenu(false)} className="hover:text-white transition">All Prompts</Link>
                 {user && (
                   <>
-                    <Link
-                      href="/admin"
-                      onClick={() => setMobileMenu(false)}
-                      className="hover:text-white transition"
-                    >
-                      Dashboard
-                    </Link>
-
-                    <Link
-                      href="/profile"
-                      onClick={() => setMobileMenu(false)}
-                      className="hover:text-white transition"
-                    >
-                      Profile
-                    </Link>
+                    <Link href={getDashboardRoute()} onClick={() => setMobileMenu(false)} className="hover:text-white transition">Dashboard</Link>
+                    <Link href="/profile" onClick={() => setMobileMenu(false)} className="hover:text-white transition">Profile</Link>
                   </>
                 )}
               </div>
 
               {!user ? (
-                <button
-                  onClick={() => {
-                    setShowLogin(true);
-                    setMobileMenu(false);
-                  }}
-                  className="mt-5 w-full h-11 rounded-full border border-[#7b61ff] text-[#d8c3ff]"
-                >
+                <button onClick={() => { setShowLogin(true); setMobileMenu(false); }} className="mt-5 w-full h-11 rounded-full border border-[#7b61ff] text-[#d8c3ff]">
                   Login
                 </button>
               ) : (
-                <button
-                  onClick={handleLogout}
-                  className="mt-5 w-full h-11 rounded-full border border-red-400 text-red-400"
-                >
+                <button onClick={handleLogout} className="mt-5 w-full h-11 rounded-full border border-red-400 text-red-400">
                   Logout
                 </button>
               )}
@@ -194,10 +179,7 @@ export default function Navbar() {
       </nav>
 
       {showLogin && (
-        <LoginModal
-          setShowLogin={setShowLogin}
-          closeModal={closeLogin}
-        />
+        <LoginModal setShowLogin={setShowLogin} closeModal={closeLogin} />
       )}
     </>
   );
