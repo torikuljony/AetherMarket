@@ -5,8 +5,8 @@ import Filters from "./Filters";
 import AssetsGrid from "./AssetsGrid";
 import Trending from "./Trending";
 import MarketStats from "./MarketStats";
-import AssetDetail from "./AssetDetail";     // ← নতুন যোগ করো
-import assets from "../../data/assets";      // ← পাথ ঠিক করে নিবে
+import AssetDetail from "./AssetDetail";
+import assets from "../../data/assets";
 
 export default function Marketplace() {
   const [filters, setFilters] = useState({
@@ -14,7 +14,7 @@ export default function Marketplace() {
     price: "",
   });
 
-  const [selectedAsset, setSelectedAsset] = useState(null);   // ← নতুন
+  const [selectedAsset, setSelectedAsset] = useState(null);
 
   const handleCardClick = (asset) => {
     setSelectedAsset(asset);
@@ -24,12 +24,10 @@ export default function Marketplace() {
     setSelectedAsset(null);
   };
 
-  // Detail View খোলা থাকলে এটা দেখাবে
   if (selectedAsset) {
     return <AssetDetail asset={selectedAsset} onBack={handleBack} />;
   }
 
-  // Normal Marketplace View
   return (
     <section className="bg-[#050816] px-8 py-16">
       <div className="max-w-[1400px] mx-auto grid grid-cols-12 gap-8">
@@ -39,13 +37,25 @@ export default function Marketplace() {
         </div>
 
         <div className="col-span-7">
+          
+          {/* PRO Upgrade Banner - Added Here */}
+          <div className="mb-8 bg-gradient-to-r from-yellow-500 to-orange-500 p-6 rounded-2xl text-black">
+            <h2 className="text-2xl font-bold">Upgrade to PRO 🚀</h2>
+            <p className="mb-4">Unlock all prompts forever + exclusive features</p>
+            <a href="/pro">
+              <button className="bg-black text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-900 transition">
+                Buy PRO
+              </button>
+            </a>
+          </div>
+
           <h1 className="text-white text-3xl font-bold mb-6">
             Latest Assets
           </h1>
 
           <AssetsGrid 
             filters={filters} 
-            onCardClick={handleCardClick}     // ← নতুন প্রপ যোগ করা হলো
+            onCardClick={handleCardClick}
           />
         </div>
 

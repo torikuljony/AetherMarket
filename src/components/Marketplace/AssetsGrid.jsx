@@ -4,16 +4,14 @@ import { useState } from "react";
 import assets from "@/data/assets";
 import AssetCard from "./AssetCard";
 
-export default function AssetsGrid({ filters }) {
+export default function AssetsGrid({ filters, onCardClick }) {
   const [visible, setVisible] = useState(4);
 
   const filteredAssets = assets.filter((asset) => {
-    // DIFFICULTY FILTER
     const matchDifficulty =
       filters.difficulty.length === 0 ||
       filters.difficulty.includes(asset.difficulty);
 
-    // PRICE FILTER
     let matchPrice = true;
 
     if (filters.price === "free") {
@@ -31,7 +29,11 @@ export default function AssetsGrid({ filters }) {
     <div>
       <div className="grid md:grid-cols-2 gap-6">
         {filteredAssets.slice(0, visible).map((asset) => (
-          <AssetCard key={asset.id} asset={asset} />
+          <AssetCard
+            key={asset.id}
+            asset={asset}
+            onClick={() => onCardClick(asset)}
+          />
         ))}
       </div>
 

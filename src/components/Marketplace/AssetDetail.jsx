@@ -1,10 +1,52 @@
 "use client";
 
-import Image from 'next/image';
-import { useState } from 'react';
+import Image from "next/image";
+import { useState } from "react";
+import useAuth from "@/hooks/useAuth";
 
 export default function AssetDetail({ asset, onBack }) {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+
   if (!asset) return null;
+
+  const handleBuy = async () => {
+    if (!user) {
+      alert("Please login first to purchase this prompt.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          promptId: asset.id,
+          promptTitle: asset.title,
+          price: asset.price,
+          buyerEmail: user.email,
+          buyerName: user.displayName || user.email,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("🎉 Purchase Successful! You can now access this prompt.");
+      } else {
+        alert(data.message || "Purchase failed. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white p-6">
@@ -50,8 +92,13 @@ export default function AssetDetail({ asset, onBack }) {
               <span className="text-3xl font-bold">
                 {asset.price === 0 ? "FREE" : `$${asset.price}`}
               </span>
-              <button className="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-2xl font-semibold flex items-center gap-2">
-                <span>🔓</span> Unlock for Lifetime Access
+              
+              <button 
+                onClick={handleBuy}
+                disabled={loading}
+                className="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-2xl font-semibold transition-all active:scale-95 disabled:opacity-70"
+              >
+                {loading ? "Processing..." : "Buy Now"}
               </button>
             </div>
 

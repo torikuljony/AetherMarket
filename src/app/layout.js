@@ -1,7 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Footer from "@/components/Footer/Footer";
 import AuthProvider from "@/providers/AuthProvider";
+import FooterWrapper from "@/components/Footer/FooterWrapper";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,7 @@ export default function RootLayout({ children }) {
               {children}
             </main>
 
-            <Footer />
+            <FooterWrapper />
           </div>
         </AuthProvider>
       </body>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import LoginModal from "../Auth/LoginModal";
 import useAuth from "@/hooks/useAuth";
+import useRole from "@/hooks/useRole";           // ← নতুন যোগ করা
 import { usePathname } from "next/navigation";
 import {
   LogIn,
@@ -11,32 +12,16 @@ import {
   LayoutDashboard,
   Menu,
   X,
-  Sparkles,        // ← শুধু এটা যোগ করা হয়েছে
+  Sparkles,
 } from "lucide-react";
 
 export default function Navbar() {
   const [showLogin, setShowLogin] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [role, setRole] = useState("user");
 
   const { user, logOut } = useAuth();
+  const role = useRole();                    // ← নতুন যোগ করা
   const pathname = usePathname();
-
-  useEffect(() => {
-    const fetchRole = async () => {
-      if (!user?.email) return;
-
-      try {
-        const res = await fetch(`/api/users/${user.email}`);
-        const data = await res.json();
-        setRole(data?.role || "user");
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchRole();
-  }, [user]);
 
   const getDashboardRoute = () => {
     if (role === "admin") return "/dashboard/admin";
@@ -60,7 +45,7 @@ export default function Navbar() {
       <nav className="sticky top-0 z-50 w-full border-b border-[#1f2336] bg-[#050816]">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 md:px-6 h-[72px]">
 
-          {/* Logo with Sparkle Icon */}
+          {/* Logo with Sparkle */}
           <Link href="/" className="flex items-center gap-2.5">
             <Sparkles className="w-8 h-8 text-[#a78bff]" />
             <h1 className="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-[#d8c3ff]">
@@ -68,9 +53,8 @@ export default function Navbar() {
             </h1>
           </Link>
 
-          {/* বাকি সবকিছু আগের মতোই আছে */}
           <div className="flex items-center gap-4">
-            {/* ... তোমার আগের সব কোড এখানে একদম একই থাকবে ... */}
+
             <ul className="hidden md:flex items-center gap-8 text-[15px] font-semibold">
               <li>
                 <Link
@@ -99,7 +83,6 @@ export default function Navbar() {
               </li>
             </ul>
 
-            {/* Login / Dashboard / Profile / Logout buttons এবং Mobile Menu সব আগের মতোই */}
             {!user ? (
               <button
                 onClick={() => setShowLogin(true)}
@@ -149,23 +132,35 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu - আগের মতোই */}
+        {/* Mobile Menu */}
         {mobileMenu && (
           <div className="md:hidden absolute top-[72px] left-0 w-full bg-[#0c1020] border-t border-[#1f2336] z-50">
             <div className="px-6 py-5">
               <div className="flex flex-col gap-4 text-[#a5a8bb] font-medium">
-                <Link href="/" onClick={() => setMobileMenu(false)} className="hover:text-white transition">Home</Link>
-                <Link href="/marketplace" onClick={() => setMobileMenu(false)} className="hover:text-white transition">All Prompts</Link>
+                <Link href="/" onClick={() => setMobileMenu(false)} className="hover:text-white transition">
+                  Home
+                </Link>
+                <Link href="/marketplace" onClick={() => setMobileMenu(false)} className="hover:text-white transition">
+                  All Prompts
+                </Link>
+
                 {user && (
                   <>
-                    <Link href={getDashboardRoute()} onClick={() => setMobileMenu(false)} className="hover:text-white transition">Dashboard</Link>
-                    <Link href="/profile" onClick={() => setMobileMenu(false)} className="hover:text-white transition">Profile</Link>
+                    <Link href={getDashboardRoute()} onClick={() => setMobileMenu(false)} className="hover:text-white transition">
+                      Dashboard
+                    </Link>
+                    <Link href="/profile" onClick={() => setMobileMenu(false)} className="hover:text-white transition">
+                      Profile
+                    </Link>
                   </>
                 )}
               </div>
 
               {!user ? (
-                <button onClick={() => { setShowLogin(true); setMobileMenu(false); }} className="mt-5 w-full h-11 rounded-full border border-[#7b61ff] text-[#d8c3ff]">
+                <button
+                  onClick={() => { setShowLogin(true); setMobileMenu(false); }}
+                  className="mt-5 w-full h-11 rounded-full border border-[#7b61ff] text-[#d8c3ff]"
+                >
                   Login
                 </button>
               ) : (
