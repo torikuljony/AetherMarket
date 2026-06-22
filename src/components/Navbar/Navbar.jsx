@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import LoginModal from "../Auth/LoginModal";
@@ -13,13 +12,12 @@ import {
   Menu,
   X,
   Sparkles,
-  Gem,           // ← যোগ করা হয়েছে
+  Gem,
 } from "lucide-react";
 
 export default function Navbar() {
   const [showLogin, setShowLogin] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
-
   const { user, logOut } = useAuth();
   const role = useRole();
   const pathname = usePathname();
@@ -45,7 +43,6 @@ export default function Navbar() {
     <>
       <nav className="sticky top-0 z-50 w-full border-b border-[#1f2336] bg-[#050816]">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 md:px-6 h-[72px]">
-
           {/* Logo with Sparkle + PRO Badge */}
           <Link href="/" className="flex items-center gap-2.5">
             <Sparkles className="w-8 h-8 text-[#a78bff]" />
@@ -53,7 +50,6 @@ export default function Navbar() {
               <h1 className="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-[#d8c3ff]">
                 AetherMarket
               </h1>
-
               {user?.membership === "pro" && (
                 <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 text-black font-bold text-[10px]">
                   <Gem size={12} />
@@ -64,7 +60,6 @@ export default function Navbar() {
           </Link>
 
           <div className="flex items-center gap-4">
-
             <ul className="hidden md:flex items-center gap-8 text-[15px] font-semibold">
               <li>
                 <Link
@@ -78,7 +73,6 @@ export default function Navbar() {
                   Home
                 </Link>
               </li>
-
               <li>
                 <Link
                   href="/marketplace"
@@ -92,6 +86,13 @@ export default function Navbar() {
                 </Link>
               </li>
             </ul>
+
+            {/* ✅ Added PRO Button Here */}
+            {/* <Link href="/pro">
+              <button className="hidden md:flex h-10 px-4 rounded-full bg-cyan-400 text-black font-bold">
+                PRO
+              </button>
+            </Link> */}
 
             {!user ? (
               <button
@@ -109,7 +110,6 @@ export default function Navbar() {
                     Dashboard
                   </button>
                 </Link>
-
                 <Link href="/profile">
                   <img
                     src={
@@ -122,7 +122,6 @@ export default function Navbar() {
                     className="hidden md:block w-10 h-10 rounded-full object-cover border border-[#2d3148]"
                   />
                 </Link>
-
                 <button
                   onClick={handleLogout}
                   className="hidden md:flex h-10 px-5 rounded-full border border-red-400 text-red-400 items-center gap-2 hover:bg-red-500/10 transition"
@@ -153,7 +152,6 @@ export default function Navbar() {
                 <Link href="/marketplace" onClick={() => setMobileMenu(false)} className="hover:text-white transition">
                   All Prompts
                 </Link>
-
                 {user && (
                   <>
                     <Link href={getDashboardRoute()} onClick={() => setMobileMenu(false)} className="hover:text-white transition">

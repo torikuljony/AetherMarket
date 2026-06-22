@@ -14,6 +14,7 @@ export const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const googleProvider = new GoogleAuthProvider();
 
@@ -26,8 +27,43 @@ export default function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/users/${currentUser.email}`);
+
+        if (!res.ok) {
+          setUser({
+            ...currentUser,
+            role: "user",
+            membership: "free",
+          });
+          return;
+        }
+
+        const dbUser = await res.json();
+
+        setUser({
+          ...currentUser,
+          role: dbUser?.role || "user",
+          membership: dbUser?.membership || "free",
+        });
+      } catch (error) {
+        console.log(error);
+
+        setUser({
+          ...currentUser,
+          role: "user",
+          membership: "free",
+        });
+      } finally {
+        setLoading(false);
+      }
     });
 
     return () => unsubscribe();
@@ -35,6 +71,7 @@ export default function AuthProvider({ children }) {
 
   const authInfo = {
     user,
+    loading,
     googleLogin,
     logOut,
   };

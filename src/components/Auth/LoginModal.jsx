@@ -8,15 +8,20 @@ import useAuth from "@/hooks/useAuth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebase.config";
 
-export default function LoginModal() {
+export default function LoginModal({ setShowLogin }) {
   const router = useRouter();
   const { googleLogin } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const closeModal = () => {
-    router.push("/");
+    if (setShowLogin) {
+      setShowLogin(false);
+    } else {
+      router.push("/");
+    }
   };
 
   useEffect(() => {
@@ -64,6 +69,10 @@ export default function LoginModal() {
   };
 
   const handleGoogleLogin = async () => {
+    if (loading) return;
+
+    setLoading(true);
+
     try {
       const result = await googleLogin();
 
@@ -79,12 +88,19 @@ export default function LoginModal() {
       redirectDashboard(role);
     } catch (error) {
       console.log(error);
-      alert(error.message);
+
+      if (error.code !== "auth/cancelled-popup-request") {
+        alert(error.message);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    setLoading(true);
 
     try {
       const result = await signInWithEmailAndPassword(
@@ -100,6 +116,8 @@ export default function LoginModal() {
     } catch (error) {
       console.log(error);
       alert(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -130,15 +148,16 @@ export default function LoginModal() {
         </p>
 
         <button
+          disabled={loading}
           onClick={handleGoogleLogin}
-          className="mt-6 w-full h-12 flex items-center justify-center gap-3 rounded-xl bg-white text-black font-semibold"
+          className="mt-6 w-full h-12 flex items-center justify-center gap-3 rounded-xl bg-white text-black font-semibold disabled:opacity-50"
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             className="w-5 h-5"
             alt="google"
           />
-          Sign in with Google
+          {loading ? "Please wait..." : "Sign in with Google"}
         </button>
 
         <div className="flex items-center gap-3 my-6">
@@ -165,10 +184,11 @@ export default function LoginModal() {
           />
 
           <button
+            disabled={loading}
             type="submit"
-            className="h-12 w-full rounded-xl bg-[#d8c3ff] font-semibold text-black"
+            className="h-12 w-full rounded-xl bg-[#d8c3ff] font-semibold text-black disabled:opacity-50"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

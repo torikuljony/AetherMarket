@@ -39,12 +39,16 @@ export default function Marketplace() {
         <div className="col-span-7">
           
           {/* PRO Upgrade Banner - Added Here */}
-          <div className="mb-8 bg-gradient-to-r from-yellow-500 to-orange-500 p-6 rounded-2xl text-black">
-            <h2 className="text-2xl font-bold">Upgrade to PRO 🚀</h2>
-            <p className="mb-4">Unlock all prompts forever + exclusive features</p>
+          <div className="mb-8 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-3xl p-6">
+            <h2 className="text-3xl font-bold text-black mb-2">
+              Upgrade to PRO 💎
+            </h2>
+            <p className="text-black/80 mb-4">
+              Get unlimited access to all premium prompts with one purchase.
+            </p>
             <a href="/pro">
-              <button className="bg-black text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-900 transition">
-                Buy PRO
+              <button className="bg-black text-white px-5 py-3 rounded-xl font-semibold">
+                Buy PRO Now
               </button>
             </a>
           </div>

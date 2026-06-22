@@ -8,16 +8,25 @@ export default function useRole() {
   const [role, setRole] = useState(null);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.email) {
+      setRole(null);
+      return;
+    }
 
     const fetchRole = async () => {
       try {
-        const res = await fetch(`/api/users?email=${user.email}`);
-        const data = await res.json();
+        const res = await fetch(`/api/users/${user.email}`);
 
+        if (!res.ok) {
+          setRole("user");
+          return;
+        }
+
+        const data = await res.json();
         setRole(data?.role || "user");
       } catch (error) {
         console.log(error);
+        setRole("user");
       }
     };
 

@@ -1,3 +1,6 @@
+import { NextResponse } from "next/server";
+import clientPromise from "@/lib/mongodb";
+
 export async function POST(req) {
   try {
     const userData = await req.json();
@@ -23,11 +26,44 @@ export async function POST(req) {
       createdAt: new Date(),
     });
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json(result, {
+      status: 201,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return NextResponse.json(
+      {
+        error: error.message,
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
+
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get("email");
+
+    const client = await clientPromise;
+    const db = client.db("aetherMarketDB");
+
+    const user = await db.collection("users").findOne({
+      email,
+    });
+
+    return NextResponse.json(user || {});
   } catch (error) {
     return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
+      {
+        error: error.message,
+      },
+      {
+        status: 500,
+      }
     );
   }
 }

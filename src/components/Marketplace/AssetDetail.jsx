@@ -6,6 +6,8 @@ import useAuth from "@/hooks/useAuth";
 
 export default function AssetDetail({ asset, onBack }) {
   const { user } = useAuth();
+  const isProUser = user?.membership === "pro";   // ← এটা যোগ করা হয়েছে
+
   const [loading, setLoading] = useState(false);
 
   if (!asset) return null;
@@ -93,13 +95,19 @@ export default function AssetDetail({ asset, onBack }) {
                 {asset.price === 0 ? "FREE" : `$${asset.price}`}
               </span>
               
-              <button 
-                onClick={handleBuy}
-                disabled={loading}
-                className="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-2xl font-semibold transition-all active:scale-95 disabled:opacity-70"
-              >
-                {loading ? "Processing..." : "Buy Now"}
-              </button>
+              {isProUser ? (
+                <div className="px-8 py-3 rounded-2xl bg-green-500 text-black font-bold">
+                  🔓 Unlocked with PRO
+                </div>
+              ) : (
+                <button 
+                  onClick={handleBuy}
+                  disabled={loading}
+                  className="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-2xl font-semibold transition-all active:scale-95 disabled:opacity-70"
+                >
+                  {loading ? "Processing..." : "Buy Now"}
+                </button>
+              )}
             </div>
 
             <p className="text-gray-300 leading-relaxed text-lg">
