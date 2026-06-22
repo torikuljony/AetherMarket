@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import LoginModal from "../Auth/LoginModal";
 import useAuth from "@/hooks/useAuth";
-import useRole from "@/hooks/useRole";           // ← নতুন যোগ করা
+import useRole from "@/hooks/useRole";
 import { usePathname } from "next/navigation";
 import {
   LogIn,
@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Sparkles,
+  Gem,           // ← যোগ করা হয়েছে
 } from "lucide-react";
 
 export default function Navbar() {
@@ -20,7 +21,7 @@ export default function Navbar() {
   const [mobileMenu, setMobileMenu] = useState(false);
 
   const { user, logOut } = useAuth();
-  const role = useRole();                    // ← নতুন যোগ করা
+  const role = useRole();
   const pathname = usePathname();
 
   const getDashboardRoute = () => {
@@ -45,12 +46,21 @@ export default function Navbar() {
       <nav className="sticky top-0 z-50 w-full border-b border-[#1f2336] bg-[#050816]">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 md:px-6 h-[72px]">
 
-          {/* Logo with Sparkle */}
+          {/* Logo with Sparkle + PRO Badge */}
           <Link href="/" className="flex items-center gap-2.5">
             <Sparkles className="w-8 h-8 text-[#a78bff]" />
-            <h1 className="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-[#d8c3ff]">
-              AetherMarket
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-[#d8c3ff]">
+                AetherMarket
+              </h1>
+
+              {user?.membership === "pro" && (
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 text-black font-bold text-[10px]">
+                  <Gem size={12} />
+                  PRO
+                </div>
+              )}
+            </div>
           </Link>
 
           <div className="flex items-center gap-4">
